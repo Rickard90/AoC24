@@ -12,12 +12,11 @@ int main() {
     std::map<int, int> rm;
     while (std::getline(std::cin, line)) {
         std::stringstream ss {line};
-        int a {};
-        ss >> a;
-        int b {};
-        ss >> b;
+        int a {}, b {};
+        ss >> a >> b;
         lv.push_back(a);
         rv.push_back(b);
+        rm[b]++;
     }
     std::sort(lv.begin(), lv.end());
     std::sort(rv.begin(), rv.end());
@@ -27,13 +26,10 @@ int main() {
     std::cout << "Part1: " << sum << std::endl;
 
     sum = 0;
-    for (int a : rv) {
-        rm[a]++;
-    }
     for (int a : lv) {
         sum += a * rm[a];
     }
-    std::cout << "Part1: " << sum << std::endl;
+    std::cout << "Part2: " << sum << std::endl;
 
     return 0;
 }
