@@ -15,8 +15,8 @@ int count1(grid<char>& grid, const coord& pos, const std::string& word) {
                     wrong = true;
                     break;
                 }
-                next_pos.first += x;
-                next_pos.second += y;
+                next_pos.x += x;
+                next_pos.y += y;
             }
             count += !wrong;
         }
@@ -25,9 +25,9 @@ int count1(grid<char>& grid, const coord& pos, const std::string& word) {
 }
 
 int count2(grid<char>& grid, const coord& pos) {
-    if (pos.first > 0 && pos.first < grid.get_width()-1 &&
-            pos.second > 0 && pos.second < grid.get_height()-1 &&
-            grid.get_ne(pos) + grid.get_sw(pos) + 100 * (grid.get_se(pos) + grid.get_nw(pos)) ==
+    if (pos.x > 0 && pos.x < grid.get_width()-1 &&
+            pos.y > 0 && pos.y < grid.get_height()-1 &&
+            grid(pos.up_right()) + grid(pos.down_left()) + 100 * (grid(pos.down_right()) + grid(pos.up_left())) ==
             'M' + 'S' + 100*('M' + 'S')) {
         return 1;
     }
@@ -44,7 +44,7 @@ int main() {
     while ( std::getline(std::cin, line) ) {
         std::stringstream ss {line};
         char c {};
-        size_t x {};
+        x = 0;
         while (ss >> c) {
             grid.push(c);
             if (c =='X')

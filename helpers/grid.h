@@ -3,12 +3,41 @@
 #include <set>
 #include <sstream>
 
-using coord = std::pair<size_t, size_t>;
+struct coord {
+    size_t x {}, y {};
+    coord up() const {
+        return coord{x, y-1};
+    };
+    coord down() const {
+        return coord{x, y+1};
+    };
+    coord left() const {
+        return coord{x-1, y};
+    };
+    coord right() const {
+        return coord{x+1, y};
+    };
+    coord up_left() const {
+        return coord{x-1, y-1};
+    };
+    coord down_right() const {
+        return coord{x+1, y+1};
+    };
+    coord down_left() const {
+        return coord{x-1, y+1};
+    };
+    coord up_right() const {
+        return coord{x+1, y-1};
+    };
+    bool operator<(coord const other) const {
+        return x < other.x || (x == other.x && y < other.y);
+    }
+};
 
 template <typename T>
 struct grid {
     bool contains(coord pos) {
-        return pos.first < width && pos.second < height;
+        return pos.x < width && pos.y < height;
     }
     void set_width(size_t w) {
         width=w;
@@ -31,19 +60,7 @@ struct grid {
         return container[linear_index(x, y)];
     }
     T& operator()(coord pos) {
-        return container[linear_index(pos.first, pos.second)];
-    }
-    T& get_nw(coord pos) {
-        return container[linear_index(pos.first-1, pos.second-1)];
-    }
-    T& get_sw(coord pos) {
-        return container[linear_index(pos.first-1, pos.second+1)];
-    }
-    T& get_ne(coord pos) {
-        return container[linear_index(pos.first+1, pos.second-1)];
-    }
-    T& get_se(coord pos) {
-        return container[linear_index(pos.first+1, pos.second+1)];
+        return container[linear_index(pos.x, pos.y)];
     }
 private:
     std::vector<T> container {};
