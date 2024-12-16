@@ -1,7 +1,4 @@
-#include <iostream>
 #include <vector>
-#include <set>
-#include <sstream>
 
 struct coord {
     size_t x {}, y {};
