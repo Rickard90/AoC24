@@ -1,4 +1,5 @@
 #include <vector>
+#include <exception>
 
 struct coord {
     size_t x {}, y {};
@@ -44,6 +45,9 @@ struct grid {
         height = h;
         width = container.size()/height;
     }
+    void set_oor_value(T oor_value) {
+        default_return = oor_value;
+    }
     size_t get_height() {
         return height;
     }
@@ -53,14 +57,42 @@ struct grid {
     void push(T value) {
         container.push_back(value);
     }
+    void read(std::istream& stream) {
+        std::string line;
+        size_t x {}, y {};
+        while ( std::getline(stream, line) ) {
+            std::stringstream ss {line};
+            char c {};
+            x = 0;
+            while (ss >> c) {
+                push(T(c));
+                x++;
+            }
+            y++;
+        }
+        set_height(y);
+    }
     T& operator()(size_t x, size_t y) {
-        return container[linear_index(x, y)];
+        if (x < width && y < height) {
+            return container[linear_index(x, y)];
+        }
+        return default_return;
     }
     T& operator()(coord pos) {
-        return container[linear_index(pos.x, pos.y)];
+        return operator()(pos.x, pos.y);
+    }
+    T& at(size_t x, size_t y) {
+        if (!(x < width && y < height)) {
+            throw std::out_of_range(std::string{"x:" + std::to_string(x) + " y:" + std::to_string(y)});    
+        }
+        return container[linear_index(x, y)];
+    }
+    T& at(coord pos) {
+        return at(pos.x, pos.y);
     }
 private:
     std::vector<T> container {};
+    T default_return {};
     size_t width {}, height {};
     std::size_t linear_index(size_t x, size_t y) {
         return x + width * y;
