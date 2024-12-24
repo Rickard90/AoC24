@@ -1,5 +1,7 @@
 #include <vector>
 #include <exception>
+#include <sstream>
+#include <iostream>
 
 struct coord {
     size_t x {}, y {};
@@ -30,7 +32,15 @@ struct coord {
     bool operator<(coord const other) const {
         return x < other.x || (x == other.x && y < other.y);
     }
+    bool operator==(coord const other) const {
+        return x == other.x && y == other.y;
+    }
+    
 };
+std::ostream& operator<<(std::ostream& os, coord& coord_ ) {
+    os << coord_.x << " " << coord_.y;
+    return os;
+}
 
 template <typename T>
 struct grid {

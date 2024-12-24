@@ -1,5 +1,4 @@
 #include <iostream>
-#include <sstream>
 #include "../helpers/grid.h"
 
 struct square {
@@ -60,17 +59,7 @@ std::pair<uint32_t, uint32_t> count2(grid<square>& grid, size_t x, size_t y, cha
 int main() {
     uint64_t sum1 {}, sum2 {};
     grid<square> grid {};
-    std::string line;
-    size_t y {};
-    while ( std::getline(std::cin, line) ) {
-        std::stringstream ss {line};
-        char c {};
-        while (ss >> c) {
-            grid.push(square(c));
-        }
-        y++;
-    }
-    grid.set_height(y);
+    grid.read(std::cin);
     grid.set_oor_value(square(' '));
 
 
