@@ -11,94 +11,79 @@ enum direction {
 };
 
 struct state {
-    state(coord xy_, direction dir_) : xy{xy_}, dir{dir_} {};
+    state(coord xy_, direction dir_, int score_) : xy{xy_}, dir{dir_}, score{score_} {};
     state() = default;
     coord xy {};
     direction dir {right};
-    bool operator<(state const other) const {
-        return xy < other.xy || (xy == other.xy && dir < other.dir);
-    }
-};
-
-struct search_node {
-    search_node(state pos_, int score) : pos{pos_}, score{score} {};
-    search_node(coord coord_, direction dir_, int score) : pos{coord_, dir_}, score{score} {};
-    state pos {};
     int score {};
-    bool operator<(search_node const other) const {
+    bool operator<(state const& other) const {
         return score > other.score;
     }
 };
 
 
+
 int main() {
     uint64_t sum1 {}, sum2 {};
+    std::set<coord> part2_pos {};
     grid<char> grid {};
-    std::set<state> searched {};
-    std::priority_queue<search_node> search_queue {};
-    coord end_pos {};
-    std::string line;
-    size_t x {}, y {};
-    while ( std::getline(std::cin, line) ) {
-        std::stringstream ss {line};
-        char c {};
-        x = 0;
-        while (ss >> c) {
-            grid.push(c);
-            if (c == 'S') {
-                search_queue.emplace(state{coord{x, y}, right}, 0);
-            }
-            x++;
+
+    auto state_comparator = [](const state& lhs, const state& rhs) {
+        return lhs.xy < rhs.xy || (lhs.xy == rhs.xy && lhs.dir < rhs.dir);
+    };
+    std::set<state, decltype(state_comparator)> searched(state_comparator);
+    std::priority_queue<state> search_queue {};
+
+    grid.read(std::cin, [&](char c, size_t x, size_t y) {
+        if (c == 'S') {
+            search_queue.emplace(state{coord{x, y}, right, 0});
         }
-        y++;
-    }
-    grid.set_height(y);
-    grid.set_oor_value(' ');
+    });
     
-    bool found {false};
-    while (!found && search_queue.size() > 0) { 
-        search_node front {search_queue.top()};
+
+    while (!search_queue.empty()) { 
+        state front {search_queue.top()};
         search_queue.pop();
-        if (grid(front.pos.xy) == 'E') {
-            found = true;
+        if (grid[front.xy] == 'E') {
             sum1 = front.score;
-        } else if (searched.find(front.pos) == searched.end()) {
-            searched.emplace(front.pos);
-            switch (front.pos.dir) {
+            break;
+        } else if (searched.find(front) == searched.end()) {
+            searched.emplace(front);
+            switch (front.dir) {
                 case direction::right:
-                    if (grid(front.pos.xy.right()) != '#') {
-                        search_queue.emplace(front.pos.xy.right(), right, front.score+1);
+                    if (grid[front.xy.right()] != '#') {
+                        search_queue.emplace(front.xy.right(), right, front.score+1);
                     }
-                    search_queue.emplace(front.pos.xy, up, front.score+1000);
-                    search_queue.emplace(front.pos.xy, down, front.score+1000);
+                    search_queue.emplace(front.xy, up, front.score+1000);
+                    search_queue.emplace(front.xy, down, front.score+1000);
                 break;
                 case direction::down:
-                    if (grid(front.pos.xy.down()) != '#') {
-                        search_queue.emplace(front.pos.xy.down(), down, front.score+1);
+                    if (grid[front.xy.down()] != '#') {
+                        search_queue.emplace(front.xy.down(), down, front.score+1);
                     }
-                    search_queue.emplace(front.pos.xy, left, front.score+1000);
-                    search_queue.emplace(front.pos.xy, right, front.score+1000);
+                    search_queue.emplace(front.xy, left, front.score+1000);
+                    search_queue.emplace(front.xy, right, front.score+1000);
                 break;
                 case direction::left:
-                    if (grid(front.pos.xy.left()) != '#') {
-                        search_queue.emplace(front.pos.xy.left(), left, front.score+1);
+                    if (grid[front.xy.left()] != '#') {
+                        search_queue.emplace(front.xy.left(), left, front.score+1);
                     }
-                    search_queue.emplace(front.pos.xy, up, front.score+1000);
-                    search_queue.emplace(front.pos.xy, down, front.score+1000);
+                    search_queue.emplace(front.xy, up, front.score+1000);
+                    search_queue.emplace(front.xy, down, front.score+1000);
                 break;
                 case direction::up:
-                    if (grid(front.pos.xy.up()) != '#') {
-                        search_queue.emplace(front.pos.xy.up(), up, front.score+1);
+                    if (grid[front.xy.up()] != '#') {
+                        search_queue.emplace(front.xy.up(), up, front.score+1);
                     }
-                    search_queue.emplace(front.pos.xy, left, front.score+1000);
-                    search_queue.emplace(front.pos.xy, right, front.score+1000);
+                    search_queue.emplace(front.xy, left, front.score+1000);
+                    search_queue.emplace(front.xy, right, front.score+1000);
                 break;
             }
         }
     }
 
     std::cout << "Part 1: " << sum1 << std::endl;
-    std::cout << "Part 2: " << sum2 << std::endl;
+    std::cout << "Part 2: " << part2_pos.size() << std::endl;
 
     return 0;
 }

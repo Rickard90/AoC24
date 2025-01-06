@@ -11,7 +11,7 @@ int count1(grid<char>& grid, const coord& pos, const std::string& word) {
             bool wrong = false;
             coord next_pos = pos;
             for (char const c : word) {
-                if (!grid.contains(next_pos) || grid(next_pos) != c) {
+                if (!grid.contains(next_pos) || grid[next_pos] != c) {
                     wrong = true;
                     break;
                 }
@@ -27,7 +27,7 @@ int count1(grid<char>& grid, const coord& pos, const std::string& word) {
 int count2(grid<char>& grid, const coord& pos) {
     if (pos.x > 0 && pos.x < grid.get_width()-1 &&
             pos.y > 0 && pos.y < grid.get_height()-1 &&
-            grid(pos.up_right()) + grid(pos.down_left()) + 100 * (grid(pos.down_right()) + grid(pos.up_left())) ==
+            grid[pos.up_right()] + grid[pos.down_left()] + 100 * (grid[pos.down_right()] + grid[pos.up_left()]) ==
             'M' + 'S' + 100*('M' + 'S')) {
         return 1;
     }
@@ -37,25 +37,15 @@ int count2(grid<char>& grid, const coord& pos) {
 
 int main() {
     int sum1 {}, sum2 {};
-    std::string line;
     size_t x {}, y {};
     grid<char> grid {};
     std::set<coord> pos_with_x {}, pos_with_a {};
-    while ( std::getline(std::cin, line) ) {
-        std::stringstream ss {line};
-        char c {};
-        x = 0;
-        while (ss >> c) {
-            grid.push(c);
-            if (c =='X')
-                pos_with_x.insert(coord{x, y});
-            else if (c == 'A')
-                pos_with_a.insert(coord{x, y});
-            x++;
-        }
-        y++;
-    }
-    grid.set_height(y);
+    grid.read(std::cin, [&](char c, size_t x, size_t y) {
+        if (c == 'X')
+            pos_with_x.insert(coord{x, y});
+        else if (c == 'A')
+            pos_with_a.insert(coord{x, y});
+    });
     
     std::string word {"XMAS"}; 
     for (coord pos : pos_with_x) {
@@ -67,6 +57,8 @@ int main() {
 
     std::cout << "Part 1: " << sum1 << std::endl;
     std::cout << "Part 2: " << sum2 << std::endl;
+    //Part 1: 2458
+    //Part 2: 1945
 
     return 0;
 }
