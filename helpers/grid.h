@@ -107,7 +107,7 @@ public:
         if (x < width && y < height) {
             return container[linear_index(x, y)];
         }
-        throw std::out_of_range(std::string{"x:" + std::to_string(x) + " y:" + std::to_string(y)});    
+        throw std::out_of_range(std::string{"x:" + std::to_string(x) + " y:" + std::to_string(y)});
     }
     T& at(coord pos) {
         return at(pos.x, pos.y);
